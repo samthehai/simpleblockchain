@@ -8,13 +8,14 @@ import (
 // Blockchain is database ordered, back-linked list to store the blocks, in order to
 // quickly get the latest block in the chain and efficently get the block by its hash
 type Blockchain struct {
+	address         string
 	chain           []*Block
 	transactionPool []*Transaction
 }
 
 // NewBlockChain creates a new blockchain with genesis block
-func NewBlockChain() *Blockchain {
-	return &Blockchain{chain: []*Block{NewGenesisBlock()}}
+func NewBlockChain(address string) *Blockchain {
+	return &Blockchain{address: address, chain: []*Block{NewGenesisBlock()}}
 }
 
 // AddBlock creates and adds new block to blockchain

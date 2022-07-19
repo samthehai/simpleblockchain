@@ -2,10 +2,15 @@ package simpleblockchain
 
 import (
 	"fmt"
+	"log"
 	"strings"
 )
 
-const MINING_DIFFICULTY = 3
+const (
+	MINING_DIFFICULTY = 3
+	MINING_SENDER     = "THE BLOCKCHAIN"
+	MINING_REWARD     = 1.0
+)
 
 func (bc *Blockchain) CopyTransactionPool() []*Transaction {
 	transactions := make([]*Transaction, 0, len(bc.transactionPool))
@@ -30,4 +35,11 @@ func (bc *Blockchain) ProofOfWork() uint64 {
 		nonce += 1
 	}
 	return nonce
+}
+
+func (bc *Blockchain) Mining() error {
+	bc.AddTransaction(MINING_SENDER, bc.address, MINING_REWARD)
+	bc.AddBlock(bc.ProofOfWork(), bc.LastBlock().Hash())
+	log.Println("action=mining, status=success")
+	return nil
 }
