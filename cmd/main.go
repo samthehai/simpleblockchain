@@ -3,8 +3,17 @@ package main
 import "github.com/samthehai/simpleblockchain"
 
 func main() {
-	blockchain := simpleblockchain.NewBlockChain()
-	blockchain.AddBlock("send 1 BTC to No-One")
-	blockchain.AddBlock("send 2 BTC to Some-One")
+	blockchain := simpleblockchain.NewBlockChain("my_address")
+	blockchain.Print()
+
+	blockchain.AddTransaction("A", "B", 1.0)
+	blockchain.Mining()
+	blockchain.Print()
+
+	blockchain.AddTransaction("C", "D", 2.0)
+	blockchain.AddTransaction("X", "Y", 3.0)
+	blockchain.Mining()
+	blockchain.Print()
+
 	blockchain.Print()
 }
