@@ -40,6 +40,22 @@ func (bc *Blockchain) LastBlock() *Block {
 	return bc.chain[len(bc.chain)-1]
 }
 
+func (bc *Blockchain) TotalAmount() float32 {
+	var totalAmount float32
+	for _, b := range bc.chain {
+		for _, tx := range b.Transactions {
+			if tx.RecipientAddress == bc.address {
+				totalAmount += tx.Value
+			}
+
+			if tx.SenderAddress == bc.address {
+				totalAmount -= tx.Value
+			}
+		}
+	}
+	return totalAmount
+}
+
 func (bc *Blockchain) Print() {
 	for i, b := range bc.chain {
 		fmt.Printf("%s Chain %d %s\n", strings.Repeat("=", 25), i,
