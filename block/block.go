@@ -1,4 +1,4 @@
-package simpleblockchain
+package block
 
 import (
 	"crypto/sha256"

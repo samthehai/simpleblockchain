@@ -1,19 +1,28 @@
 package main
 
-import "github.com/samthehai/simpleblockchain"
+import (
+	"fmt"
+
+	"github.com/samthehai/simpleblockchain/block"
+	"github.com/samthehai/simpleblockchain/wallet"
+)
 
 func main() {
-	blockchain := simpleblockchain.NewBlockChain("my_address")
-	blockchain.Print()
+	walletM := wallet.NewWallet()
+	walletA := wallet.NewWallet()
+	walletB := wallet.NewWallet()
 
-	blockchain.AddTransaction("A", "B", 1.0)
+	tx := wallet.NewTransaction(walletA.PrivateKey, walletA.PublicKey,
+		walletA.BlockchainAddress, walletB.BlockchainAddress, 1.0)
+
+	blockchain := block.NewBlockChain(walletM.BlockchainAddress)
+	blockchain.AddTransaction(walletA.BlockchainAddress, walletB.BlockchainAddress, 1.0,
+		walletA.PublicKey, tx.GenerateSignature())
+
 	blockchain.Mining()
 	blockchain.Print()
 
-	blockchain.AddTransaction("C", "D", 2.0)
-	blockchain.AddTransaction("X", "Y", 3.0)
-	blockchain.Mining()
-	blockchain.Print()
-
-	blockchain.Print()
+	fmt.Printf("A %.1f\n", blockchain.CalculateTotalAmount(walletA.BlockchainAddress))
+	fmt.Printf("B %.1f\n", blockchain.CalculateTotalAmount(walletB.BlockchainAddress))
+	fmt.Printf("M %.1f\n", blockchain.CalculateTotalAmount(walletM.BlockchainAddress))
 }
