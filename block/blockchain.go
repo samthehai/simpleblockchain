@@ -1,8 +1,13 @@
-package simpleblockchain
+package block
 
 import (
+	"crypto/ecdsa"
+	"crypto/sha256"
+	"encoding/json"
 	"fmt"
 	"strings"
+
+	"github.com/samthehai/simpleblockchain/signature"
 )
 
 // Blockchain is database ordered, back-linked list to store the blocks, in order to
@@ -30,25 +35,46 @@ func (bc *Blockchain) AddBlock(nonce uint64, prevHash [32]byte) *Block {
 	return newBlock
 }
 
-func (bc *Blockchain) AddTransaction(sender string, recipient string, value float32) *Transaction {
+func (bc *Blockchain) AddTransaction(sender string, recipient string, value float32,
+	senderPublicKey *ecdsa.PublicKey, sign *signature.Signature) (*Transaction, error) {
 	tx := NewTransaction(sender, recipient, value)
-	bc.transactionPool = append(bc.transactionPool, tx)
-	return tx
+
+	if sender == MINING_SENDER {
+		bc.transactionPool = append(bc.transactionPool, tx)
+		return tx, nil
+	}
+
+	if err := bc.VerifyTransactionSignature(senderPublicKey, sign, tx); err != nil {
+		return nil, fmt.Errorf("verify transaction: %w", err)
+	}
+
+	return tx, nil
+}
+
+func (bc *Blockchain) VerifyTransactionSignature(senderPublicKey *ecdsa.PublicKey, sign *signature.Signature,
+	tx *Transaction) error {
+	m, _ := json.Marshal(tx)
+	h := sha256.Sum256([]byte(m))
+	if ecdsa.Verify(senderPublicKey, h[:], sign.R, sign.S) {
+		return nil
+	}
+
+	return fmt.Errorf("invalid transaction signature")
 }
 
 func (bc *Blockchain) LastBlock() *Block {
 	return bc.chain[len(bc.chain)-1]
 }
 
-func (bc *Blockchain) TotalAmount() float32 {
+func (bc *Blockchain) CalculateTotalAmount(address string) float32 {
 	var totalAmount float32
 	for _, b := range bc.chain {
 		for _, tx := range b.Transactions {
-			if tx.RecipientAddress == bc.address {
+			if tx.RecipientAddress == address {
 				totalAmount += tx.Value
 			}
 
-			if tx.SenderAddress == bc.address {
+			if tx.SenderAddress == address {
 				totalAmount -= tx.Value
 			}
 		}

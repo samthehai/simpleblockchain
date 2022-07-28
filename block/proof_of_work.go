@@ -1,4 +1,4 @@
-package simpleblockchain
+package block
 
 import (
 	"fmt"
@@ -8,7 +8,7 @@ import (
 
 const (
 	MINING_DIFFICULTY = 3
-	MINING_SENDER     = "THE BLOCKCHAIN"
+	MINING_SENDER     = "THE_BLOCKCHAIN"
 	MINING_REWARD     = 1.0
 )
 
@@ -38,7 +38,7 @@ func (bc *Blockchain) ProofOfWork() uint64 {
 }
 
 func (bc *Blockchain) Mining() error {
-	bc.AddTransaction(MINING_SENDER, bc.address, MINING_REWARD)
+	bc.AddTransaction(MINING_SENDER, bc.address, MINING_REWARD, nil, nil)
 	bc.AddBlock(bc.ProofOfWork(), bc.LastBlock().Hash())
 	log.Println("action=mining, status=success")
 	return nil
