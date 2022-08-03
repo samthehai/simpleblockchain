@@ -38,7 +38,7 @@ func (bc *Blockchain) ProofOfWork() uint64 {
 }
 
 func (bc *Blockchain) Mining() error {
-	bc.AddTransaction(MINING_SENDER, bc.address, MINING_REWARD, nil, nil)
+	bc.AddTransaction(MINING_SENDER, bc.Address, MINING_REWARD, nil, nil)
 	bc.AddBlock(bc.ProofOfWork(), bc.LastBlock().Hash())
 	log.Println("action=mining, status=success")
 	return nil
