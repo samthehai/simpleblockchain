@@ -13,14 +13,14 @@ import (
 // Blockchain is database ordered, back-linked list to store the blocks, in order to
 // quickly get the latest block in the chain and efficently get the block by its hash
 type Blockchain struct {
-	address         string
-	chain           []*Block
-	transactionPool []*Transaction
+	Address         string         `json:"address"`
+	Chain           []*Block       `json:"chain"`
+	transactionPool []*Transaction `json:"transaction_pool"`
 }
 
 // NewBlockChain creates a new blockchain with genesis block
 func NewBlockChain(address string) *Blockchain {
-	return &Blockchain{address: address, chain: []*Block{NewGenesisBlock()}}
+	return &Blockchain{Address: address, Chain: []*Block{NewGenesisBlock()}}
 }
 
 // AddBlock creates and adds new block to blockchain
@@ -29,7 +29,7 @@ func (bc *Blockchain) AddBlock(nonce uint64, prevHash [32]byte) *Block {
 	// Get transaction from transactionPool
 	newBlock := NewBlock(nonce, prevBlock.Hash(), bc.transactionPool)
 	// Add new block to chain
-	bc.chain = append(bc.chain, newBlock)
+	bc.Chain = append(bc.Chain, newBlock)
 	// Reset transactionPool
 	bc.transactionPool = []*Transaction{}
 	return newBlock
@@ -63,12 +63,12 @@ func (bc *Blockchain) VerifyTransactionSignature(senderPublicKey *ecdsa.PublicKe
 }
 
 func (bc *Blockchain) LastBlock() *Block {
-	return bc.chain[len(bc.chain)-1]
+	return bc.Chain[len(bc.Chain)-1]
 }
 
 func (bc *Blockchain) CalculateTotalAmount(address string) float32 {
 	var totalAmount float32
-	for _, b := range bc.chain {
+	for _, b := range bc.Chain {
 		for _, tx := range b.Transactions {
 			if tx.RecipientAddress == address {
 				totalAmount += tx.Value
@@ -83,7 +83,7 @@ func (bc *Blockchain) CalculateTotalAmount(address string) float32 {
 }
 
 func (bc *Blockchain) Print() {
-	for i, b := range bc.chain {
+	for i, b := range bc.Chain {
 		fmt.Printf("%s Chain %d %s\n", strings.Repeat("=", 25), i,
 			strings.Repeat("=", 25))
 		b.Print()
